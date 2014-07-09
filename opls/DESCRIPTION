@@ -1,0 +1,18 @@
+Package: opls
+Title: Implementation and extension of Orthogonal Projection to Latent
+    Structures
+Version: 0.1
+Authors@R: "Paul Anderson <andersonpe2@cofc.edu> [aut, cre]"
+Description: Implementation of orthogonal projection onto latent structures
+    (OPLS). Based on the original method described by Trygg and Wold (Trygg J,
+    Wold S. Orthogonal projections to latent structures (O-PLS). J.
+    Chemometrics 2002; 16: 119128). Includes novel variable selection and
+    n-group discriminant analysis. This software is provided "AS IS" without
+    warranty of any kind, express or implied.
+Depends:
+    R (>= 3.1.0)
+Imports:
+    pracma,
+    caret
+License: MIT License
+LazyData: true
