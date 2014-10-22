@@ -93,7 +93,7 @@ opls <-
 #' @param Y - n x 1 matrix. Must be numeric 
 #' @param num_OPLS_fact - Integer specifying the number of OPLS orthogonal components.
 #' @param folds - Number of k-fold cross-validation groups or -1 for leave one out cross-validation.
-#' @return List containing \item{Q^2}{Cross-validated R^2} \item{Q2s}{One for each iteration} \item{press}{residual calculation used in Q^2 calculation} \item{accuracy}{standard accuracy that is only relevant if this is a classification problem}
+#' @return List containing \item{Q^2}{Cross-validated R^2} \item{Q2s}{One for each iteration} \item{press}{residual calculation used in Q^2 calculation} \item{Y_pred_validation}{Predicted values from the validation data} \item{accuracy}{standard accuracy that is only relevant if this is a classification problem}
 #' @export
 #' @examples
 #' res <- opls_CV(rand(10,10),rand(10,1),1,-1)
@@ -103,6 +103,7 @@ opls_CV <-
     y_sum = 0
     errors = 0
     Q2s = matrix(nrow=1,ncol=length(folds))
+    Y_pred_validation = list()
     
     for (CV_count in 1:length(folds)) {
       # set up CV data
@@ -126,6 +127,7 @@ opls_CV <-
       Y_leftOut = Y_leftOut -m_Y    
       temp_press = 0
       temp_y_sum = 0
+      Y_preds = c()
       for (cpp in 1:length(Y_leftOut)) {
         Wstar=model$w%*%solve(t(model$p)%*%model$w)
         B_pls=Wstar%*%model$b_l%*%t(model$c)
@@ -140,6 +142,7 @@ opls_CV <-
         }
         # predict
         Y_pred = z%*%B_pls
+        Y_preds[cpp] = Y_pred
         temp_press = temp_press + (Y_pred - Y_leftOut[cpp])^2
         temp_y_sum = temp_y_sum + (Y_leftOut[cpp])^2
         correct_Y = Y_pred - (Y_leftOut[cpp])
@@ -149,6 +152,7 @@ opls_CV <-
           break
         }
       }
+      Y_pred_validation[[CV_count]] = Y_preds
       Q2s[CV_count] = 1 - temp_press/temp_y_sum
       press = press + temp_press
       y_sum = y_sum + temp_y_sum
@@ -157,7 +161,7 @@ opls_CV <-
     Q2 = 1 - press/y_sum
     accuracy = (length(Y)-errors) / length(Y)
     
-    res = list(Q2=Q2,Q2s=Q2s,press=press,accuracy=accuracy)
+    res = list(Q2=Q2,Q2s=Q2s,press=press,accuracy=accuracy,Y_pred_validation=Y_pred_validation)
     return(res)
   }
 
@@ -196,7 +200,10 @@ run_opls <-
     }
     
     model = opls(X,Y,num_OPLS_fact)
+    cv_res = opls_CV(X,Y,num_OPLS_fact,folds)
     res = list(model=model,Q2=res$Q2,Q2s=res$Q2s,accuracy=res$accuracy,num_OPLS_fact=num_OPLS_fact)
+    res$folds = folds
+    res$Y_pred_validation = cv_res$Y_pred_validation
     
     res$permutation_Q2s = permutation_test(X,Y,num_OPLS_fact,num_permutations,folds)
     
