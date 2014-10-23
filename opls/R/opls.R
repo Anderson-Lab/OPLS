@@ -142,7 +142,7 @@ opls_CV <-
         }
         # predict
         Y_pred = z%*%B_pls
-        Y_preds[cpp] = Y_pred
+        Y_preds[cpp] = Y_pred + m_Y
         temp_press = temp_press + (Y_pred - Y_leftOut[cpp])^2
         temp_y_sum = temp_y_sum + (Y_leftOut[cpp])^2
         correct_Y = Y_pred - (Y_leftOut[cpp])
