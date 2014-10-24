@@ -1,7 +1,7 @@
 Package: opls
 Title: Implementation and extension of Orthogonal Projection to Latent
     Structures
-Version: 0.1
+Version: 0.2
 Authors@R: "Paul Anderson <andersonpe2@cofc.edu> [aut, cre]"
 Description: Implementation of orthogonal projection onto latent structures
     (OPLS). Based on the original method described by Trygg and Wold (Trygg J,
